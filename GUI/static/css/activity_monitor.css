@@ -1,0 +1,12 @@
+@charset "UTF-8";
+
+.dot {
+    height: 25px;
+    width: 25px;
+    border-radius: 60%;
+    display: inline-block;
+  }
+
+.bg-siata {
+    background-color: rgb(8,31,45) !important;
+}
