@@ -11,34 +11,23 @@
             <div class="card-body">
                 <hr/>
                 <div class="row row-cols-auto">
-                    <!-- 
-                    {% include "ActivityMonitor/alert.html" %}
-                    //-->
-                    {% for estacion in estaciones %}
+                    {% for process, attributes in processes.items %}
                         <div class="col mb-4">
-                            <div class="card text-center h-100" style="width: 18rem;">
-                                <h5 class="card-header">PID: {{ estacion.codigo }}</h5>
+                            <div class="card text-center h-100">
+                                <h5 class="card-header">PID: {{ attributes.pid }}</h5>
                                 <div class="card-body d-flex flex-column">
                                     <p class="card-text">
                                         Nombre:
                                         <br/>
-                                        {{ estacion.nombre }}
+                                        {{ process.upper }}
                                     </p>
-                                    {% if not estacion.estado %}
+                                    {% if attributes.status != "running" %}
                                         <span class="dot bg-danger mx-auto"></span>
                                     {% else %}
-                                        {% if estacion.estado_ultima_actualizacion %}
-                                            <span class="dot bg-warning mx-auto"></span>
-                                        {% else %}
-                                            <span class="dot bg-success mx-auto"></span>
-                                        {% endif %}
+                                        <span class="dot bg-success mx-auto"></span>
                                     {% endif %}
+                                    <h6 class="card-subtitle mt-1">{{ attributes.status }}</h6>
                                     <br/>
-                                    <h6 class="card-subtitle mb-2">
-                                        Ultima actualizacion:
-                                        <br/>
-                                        {{ estacion.ultima_actualizacion }}
-                                    </h6>
                                 </div>
                             </div>
                         </div>
@@ -47,4 +36,5 @@
             </div>
         </div>
     </div>
+    <script>setTimeout('location.reload()', 5000)</script>
 {% endblock content %}
