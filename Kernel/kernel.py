@@ -1,19 +1,16 @@
-from asyncio import subprocess
-from concurrent.futures import process
 import os
-import time
-import subprocess
-import socket
-import selectors
 import types
 import parser
+import socket
+import selectors
+import subprocess
 
 sel = selectors.DefaultSelector()
 
 HOST = "127.0.0.1"
 PORT = 3337
 
-running_process = {}
+running_processes = {}
 
 def accept_wrapper(sock):
     conn, addr = sock.accept()
@@ -37,13 +34,13 @@ def service_connection(key, mask):
     if mask & selectors.EVENT_WRITE:
         if data.outb:
             jsonRequest = parser.parseRequest(data.outb)
-            servers = parser.getServers(jsonRequest, "config.ini")
-            response = parser.connectToServer(data.outb, servers)
-            if response == b'':
-                response = b'{"status" : 500, "message" : "Error"}'
-                print("\nThere is no response from servers, the servers should be down")
-            sock.send(response)
-            data.outb = b''
+            if(jsonRequest["request"] == "get_processes"):
+                response = {"running_processes": get_processes()}
+                response = bytes(str(response), 'utf-8') 
+                print(response)
+            print(response)
+            sock.send(response) 
+            data.outb = b""
 
 def init_socket():
     lsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -64,13 +61,29 @@ def init_socket():
     finally:
         sel.close()
 
-if __name__=="__main__":
-    running_process["kernel"] = os.getpid()
+def init_processes():
     gui = subprocess.Popen("python ../GUI/manage.py runserver", shell=True, stdout=subprocess.DEVNULL)
-    running_process["gui"] = gui.pid
-    process2 = subprocess.Popen("python ../App/app.py", shell=True, stdout=subprocess.DEVNULL)
-    running_process["application"] = process2.pid
-    print("kernel pid: " + str(running_process["kernel"]))
-    print("gui pid: " + str(running_process["gui"]))
-    print("aplication pid: " + str(running_process["application"]))
-    init_socket()
+    running_processes["gui"] = gui
+    app_manager = subprocess.Popen("python ../App/app_manager.py", shell=True, stdout=subprocess.DEVNULL)
+    running_processes["app manager"] = app_manager
+
+def get_processes():
+    processes={}
+    for name, process in running_processes.items():
+        print(name + ": " + str(process.pid))
+        if(process.poll() is None):
+            processes[name] = {"pid": process.pid, "status": "running"}
+        else:
+            processes[name] = {"pid": process.pid, "status": "stopped"}
+    processes["kernel"] = {"pid": os.getpid(), "status": "running"}
+    return processes
+
+if __name__=="__main__":
+    try:
+        init_processes()
+        print(get_processes())
+        init_socket()
+    finally:
+        print("Killing processes")
+        for process in running_processes.values():
+            process.kill()
