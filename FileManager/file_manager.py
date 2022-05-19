@@ -3,14 +3,13 @@ import types
 import parser
 import socket
 import selectors
-import subprocess
 
 sel = selectors.DefaultSelector()
 
 HOST = "127.0.0.1"
-PORT = 3337
+PORT = 3342
 
-running_processes = {}
+PATH = "/Users/jpgomezt/Projects/Final_Sistemas_Operativos/FileManager/Files"
 
 def accept_wrapper(sock):
     conn, addr = sock.accept()
@@ -34,11 +33,13 @@ def service_connection(key, mask):
     if mask & selectors.EVENT_WRITE:
         if data.outb:
             jsonRequest = parser.parseRequest(data.outb)
-            if(jsonRequest["request"] == "get_processes"):
-                response = {"running_processes": get_processes()}
-                response = bytes(str(response), 'utf-8') 
-            elif(jsonRequest["request"] == "get_folders" or jsonRequest["request"] == "create_folder" or jsonRequest["request"] == "delete_folder"):
-                response = parser.request_file_manager(jsonRequest)
+            if(jsonRequest["request"] == "create_folder"):
+                response = {"result": str(create_folder(jsonRequest["folder_name"]))}
+            elif(jsonRequest["request"] == "get_folders"):
+                response = {"folders": get_folders()}
+            elif(jsonRequest["request"] == "delete_folder"):
+                response = {"result": str(delete_folder(jsonRequest["folder_name"]))}
+            response = bytes(str(response), 'utf-8')
             print(response)
             sock.send(response) 
             data.outb = b""
@@ -62,31 +63,25 @@ def init_socket():
     finally:
         sel.close()
 
-def init_processes():
-    #gui = subprocess.Popen("python ../GUI/manage.py runserver", shell=True, stdout=subprocess.DEVNULL)
-    #running_processes["gui"] = gui
-    app_manager = subprocess.Popen("python ../App/app_manager.py", shell=True, stdout=subprocess.DEVNULL)
-    running_processes["app manager"] = app_manager
-    file_manager = subprocess.Popen("python ../FileManager/file_manager.py", shell=True, stdout=subprocess.DEVNULL)
-    running_processes["file manager"] = file_manager
+def get_folders():
+    try:
+        return os.listdir(PATH)
+    except:
+        return str(False)
 
-def get_processes():
-    processes={}
-    for name, process in running_processes.items():
-        print(name + ": " + str(process.pid))
-        if(process.poll() is None):
-            processes[name] = {"pid": process.pid, "status": "running"}
-        else:
-            processes[name] = {"pid": process.pid, "status": "stopped"}
-    processes["kernel"] = {"pid": os.getpid(), "status": "running"}
-    return processes
+def create_folder(folder_name):
+    try:
+        os.mkdir(PATH + "/" + folder_name)
+        return True
+    except OSError:
+        return False
+
+def delete_folder(folder_name):
+    try:
+        os.rmdir(PATH + "/" + folder_name)
+        return True
+    except OSError:
+        return False
 
 if __name__=="__main__":
-    try:
-        init_processes()
-        print(get_processes())
-        init_socket()
-    finally:
-        print("Killing processes")
-        for process in running_processes.values():
-            process.kill()
+    init_socket()

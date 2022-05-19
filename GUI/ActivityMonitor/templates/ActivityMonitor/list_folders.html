@@ -1,0 +1,35 @@
+{% extends "ActivityMonitor/layout.html" %}
+{% block title %}
+    Delete Folder
+{% endblock title %}
+{% block content %}
+    <div class="card">
+        <div class="card-header">Manage Folders</div>
+        <div class="card-body">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Delete</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for folder in folders %}
+                        <tr>
+                            <td>{{ forloop.counter0 }}</td>
+                            <td>/{{ folder }}</td>
+                            <td>
+                                <a class="nav-link" href="{% url 'delete_folder' folder_name=folder %}">
+                                    <button class="btn btn-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock content %}

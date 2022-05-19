@@ -17,17 +17,23 @@
                                 <h5 class="card-header">PID: {{ attributes.pid }}</h5>
                                 <div class="card-body d-flex flex-column">
                                     <p class="card-text">
-                                        Nombre:
+                                        Process:
                                         <br/>
-                                        {{ process.upper }}
+                                        {{ process.title }}
                                     </p>
                                     {% if attributes.status != "running" %}
                                         <span class="dot bg-danger mx-auto"></span>
                                     {% else %}
                                         <span class="dot bg-success mx-auto"></span>
                                     {% endif %}
-                                    <h6 class="card-subtitle mt-1">{{ attributes.status }}</h6>
+                                    <h6 class="card-subtitle mt-1">{{ attributes.status.capitalize }}</h6>
                                     <br/>
+                                    {% if process == "file manager" and attributes.status == "running" %}
+                                        <div class="input-group justify-content-md-center h1">
+                                            <a class="nav-link text-dark h1" href="{% url 'create_folder' %}"><i class="fas fa-folder-plus"></i></a>
+                                            <a class="nav-link text-dark h1" href="{% url 'list_folders' %}"><i class="fas fa-folder-open"></i></a>
+                                        </div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -36,5 +42,4 @@
             </div>
         </div>
     </div>
-    <script>setTimeout('location.reload()', 5000)</script>
 {% endblock content %}

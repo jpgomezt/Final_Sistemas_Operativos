@@ -1,0 +1,12 @@
+{% extends "ActivityMonitor/layout.html" %}
+{% block title %}
+    Create Folder
+{% endblock title %}
+{% block content %}
+    <h2>Create a New Folder</h2>
+    <form method="post" class="post-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="save btn btn-secondary">Create</button>
+    </form>
+{% endblock content %}
