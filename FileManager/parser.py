@@ -1,6 +1,4 @@
 import json
-import socket
-import configparser
 
 FILE = "config.ini"
 
