@@ -39,6 +39,8 @@ def service_connection(key, mask):
                 response = bytes(str(response), 'utf-8') 
             elif(jsonRequest["request"] == "get_folders" or jsonRequest["request"] == "create_folder" or jsonRequest["request"] == "delete_folder"):
                 response = parser.request_file_manager(jsonRequest)
+            elif(jsonRequest["request"] == "get_apps" or jsonRequest["request"] == "launch_app" or jsonRequest["request"] == "kill_app"):
+                response = parser.request_app_manager(jsonRequest)
             print(response)
             sock.send(response) 
             data.outb = b""

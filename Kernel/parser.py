@@ -25,3 +25,18 @@ def request_file_manager(request):
     print("Response:", response)
     sock.close()
     return response
+
+def request_app_manager(request):
+    config = configparser.ConfigParser()
+    config.read(FILE)
+    server_ip, server_port = dict(config.items('AppManager'))["sever"].split(",")
+    server_port = int(server_port)
+    response = b''
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect((server_ip, server_port))
+    request = bytes(str(request), 'utf-8') 
+    sock.sendall(request)
+    response = sock.recv(1024)
+    print("Response:", response)
+    sock.close()
+    return response
