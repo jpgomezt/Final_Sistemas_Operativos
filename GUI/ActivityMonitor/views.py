@@ -66,3 +66,42 @@ def delete_folder(request, folder_name):
     result = json.loads(strResponse)
     return redirect('list_folders')
 
+def list_apps(request):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect((HOST, PORT))
+    sock_request = {"request": "get_apps"} 
+    jsonBytes = bytes(str(sock_request), 'utf-8') 
+    sock.sendall(jsonBytes)
+    response = sock.recv(1024)
+    strResponse = response.decode('utf-8')
+    strResponse = strResponse.replace('\'', '\"')
+    apps = json.loads(strResponse)["apps"]
+    print(type(apps))
+    print(apps)
+    return render(request, 'ActivityMonitor/list_apps.html', {'apps': apps})
+
+def launch_app(request):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect((HOST, PORT))
+    sock_request = {"request": "launch_app"} 
+    jsonBytes = bytes(str(sock_request), 'utf-8') 
+    sock.sendall(jsonBytes)
+    response = sock.recv(1024)
+    strResponse = response.decode('utf-8')
+    strResponse = strResponse.replace('\'', '\"')
+    print(strResponse)
+    result = json.loads(strResponse)
+    return redirect('list_apps')
+
+def kill_app(request, app_pid):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect((HOST, PORT))
+    sock_request = {"request": "kill_app", "app_pid": app_pid}
+    jsonBytes = bytes(str(sock_request), 'utf-8') 
+    sock.sendall(jsonBytes)
+    response = sock.recv(1024)
+    strResponse = response.decode('utf-8')
+    strResponse = strResponse.replace('\'', '\"')
+    print(strResponse)
+    result = json.loads(strResponse)
+    return redirect('list_apps')

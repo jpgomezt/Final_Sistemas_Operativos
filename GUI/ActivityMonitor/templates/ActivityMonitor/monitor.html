@@ -34,6 +34,12 @@
                                             <a class="nav-link text-dark h1" href="{% url 'list_folders' %}"><i class="fas fa-folder-open"></i></a>
                                         </div>
                                     {% endif %}
+                                    {% if process == "app manager" and attributes.status == "running" %}
+                                        <div class="input-group justify-content-md-center h1">
+                                            <a class="nav-link text-dark h1" href="{% url 'launch_app' %}"><i class="fas fa-plus-circle"></i></a>
+                                            <a class="nav-link text-dark h1" href="{% url 'list_apps' %}"><i class="fas fa-list-ul"></i></a>
+                                        </div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>

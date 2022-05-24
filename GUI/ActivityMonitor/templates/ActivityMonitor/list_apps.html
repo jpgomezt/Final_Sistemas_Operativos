@@ -1,0 +1,51 @@
+{% extends "ActivityMonitor/layout.html" %}
+{% block title %}
+    List Apps
+{% endblock title %}
+{% block content %}
+    <div class="card">
+        <div class="card-header">Manage Apps</div>
+        <div class="card-body">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">PID</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Close</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for app, attributes in apps.items %}
+                        <tr>
+                            <td>{{ forloop.counter0 }}</td>
+                            <td>{{ attributes.pid }}</td>
+                            <td>
+                                {% if attributes.status != "running" %}
+                                    <span class="dot bg-danger mx-auto"></span>
+                                {% else %}
+                                    <span class="dot bg-success mx-auto"></span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if attributes.status != "running" %}
+                                    <a class="nav-link" href="{% url 'kill_app' app_pid=attributes.pid %}">
+                                        <button class="btn btn-warning">
+                                            <i class="fas fa-paint-roller"></i>
+                                        </button>
+                                    </a>
+                                {% else %}
+                                    <a class="nav-link" href="{% url 'kill_app' app_pid=attributes.pid %}">
+                                        <button class="btn btn-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock content %}
