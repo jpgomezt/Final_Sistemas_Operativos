@@ -36,11 +36,13 @@ def service_connection(key, mask):
             jsonRequest = parser.parseRequest(data.outb)
             if(jsonRequest["request"] == "get_processes"):
                 response = {"running_processes": get_processes()}
-                response = bytes(str(response), 'utf-8') 
+                response = bytes(str(response), 'utf-8')
+                parser.log_action({"request": "write_log", "log": "KERNEL: " + jsonRequest["request"]})
             elif(jsonRequest["request"] == "get_folders" or jsonRequest["request"] == "create_folder" or jsonRequest["request"] == "delete_folder"):
                 response = parser.request_file_manager(jsonRequest)
             elif(jsonRequest["request"] == "get_apps" or jsonRequest["request"] == "launch_app" or jsonRequest["request"] == "kill_app"):
                 response = parser.request_app_manager(jsonRequest)
+                parser.log_action({"request": "write_log", "log": "APP MANAGER: " + jsonRequest["request"]})
             print(response)
             sock.send(response) 
             data.outb = b""
@@ -65,8 +67,8 @@ def init_socket():
         sel.close()
 
 def init_processes():
-    #gui = subprocess.Popen("python ../GUI/manage.py runserver", shell=True, stdout=subprocess.DEVNULL)
-    #running_processes["gui"] = gui
+    gui = subprocess.Popen("python ../GUI/manage.py runserver", shell=True, stdout=subprocess.DEVNULL)
+    running_processes["gui"] = gui
     app_manager = subprocess.Popen("python ../App/app_manager.py", shell=True, stdout=subprocess.DEVNULL)
     running_processes["app manager"] = app_manager
     file_manager = subprocess.Popen("python ../FileManager/file_manager.py", shell=True, stdout=subprocess.DEVNULL)

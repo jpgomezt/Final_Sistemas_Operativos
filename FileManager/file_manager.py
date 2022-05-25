@@ -2,6 +2,7 @@ import os
 import types
 import parser
 import socket
+import logging
 import selectors
 
 sel = selectors.DefaultSelector()
@@ -34,11 +35,16 @@ def service_connection(key, mask):
         if data.outb:
             jsonRequest = parser.parseRequest(data.outb)
             if(jsonRequest["request"] == "create_folder"):
+                write_log("FILE MANAGER: create_folder")
                 response = {"result": str(create_folder(jsonRequest["folder_name"]))}
             elif(jsonRequest["request"] == "get_folders"):
+                write_log("FILE MANAGER: get_folders")
                 response = {"folders": get_folders()}
             elif(jsonRequest["request"] == "delete_folder"):
+                write_log("FILE MANAGER: delete_folder")
                 response = {"result": str(delete_folder(jsonRequest["folder_name"]))}
+            elif(jsonRequest["request"] == "write_log"):
+                response = {"result": str(write_log(jsonRequest["log"]))}
             response = bytes(str(response), 'utf-8')
             print(response)
             sock.send(response) 
@@ -83,5 +89,13 @@ def delete_folder(folder_name):
     except OSError:
         return False
 
+def write_log(log):
+    try:
+        logging.info(log)
+        return True
+    except:
+        return False
+
 if __name__=="__main__":
+    logger_file = logging.basicConfig(filename=(PATH + "registros.log"), format='%(asctime)s %(levelname)s: %(message)s', datefmt='%Y-%m-%d %H:%M:%S %Z', level=logging.DEBUG)
     init_socket()
