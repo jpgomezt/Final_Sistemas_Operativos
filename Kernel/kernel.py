@@ -91,7 +91,7 @@ def get_processes():
 def end_process():
     for process in running_processes.values():
         process.kill()
-    os._exit()
+    os._exit(os.EX_OK)
 
 if __name__=="__main__":
     try:
