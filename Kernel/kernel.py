@@ -38,6 +38,9 @@ def service_connection(key, mask):
                 response = {"running_processes": get_processes()}
                 response = bytes(str(response), 'utf-8')
                 parser.log_action({"request": "write_log", "log": "KERNEL: " + jsonRequest["request"]})
+            elif(jsonRequest["request"] == "end_process"):
+                parser.log_action({"request": "write_log", "log": "KERNEL: " + jsonRequest["request"]})
+                end_process()
             elif(jsonRequest["request"] == "get_folders" or jsonRequest["request"] == "create_folder" or jsonRequest["request"] == "delete_folder"):
                 response = parser.request_file_manager(jsonRequest)
             elif(jsonRequest["request"] == "get_apps" or jsonRequest["request"] == "launch_app" or jsonRequest["request"] == "kill_app"):
@@ -84,6 +87,11 @@ def get_processes():
             processes[name] = {"pid": process.pid, "status": "stopped"}
     processes["kernel"] = {"pid": os.getpid(), "status": "running"}
     return processes
+
+def end_process():
+    for process in running_processes.values():
+        process.kill()
+    os._exit()
 
 if __name__=="__main__":
     try:

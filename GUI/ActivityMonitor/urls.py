@@ -9,4 +9,5 @@ urlpatterns = [
     path('app/launch', views.launch_app, name='launch_app'),
     path('app/list', views.list_apps, name='list_apps'),
     path('app/kill/<int:app_pid>', views.kill_app, name='kill_app'),
+    path('end', views.end_process, name='end_process'),
 ]

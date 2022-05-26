@@ -105,3 +105,16 @@ def kill_app(request, app_pid):
     print(strResponse)
     result = json.loads(strResponse)
     return redirect('list_apps')
+
+def end_process(request):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect((HOST, PORT))
+    sock_request = {"request": "end_process"}
+    jsonBytes = bytes(str(sock_request), 'utf-8') 
+    sock.sendall(jsonBytes)
+    response = sock.recv(1024)
+    strResponse = response.decode('utf-8')
+    strResponse = strResponse.replace('\'', '\"')
+    print(strResponse)
+    result = json.loads(strResponse)
+    return redirect('list_processes')
